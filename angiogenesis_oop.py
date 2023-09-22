@@ -336,7 +336,7 @@ class Model:
         # snapshot before the sim
         # draw graphs
         self.__update_pandas_data()
-        self.draw_graph(f"graph_at_0_{N}", "graphs")
+        self.draw_graph(f"graph_at_0_{N}", "oop_graphs")
 
 
         # print log
@@ -374,7 +374,7 @@ class Model:
             if n == N or n == N / 16 or n == (2 * N) / 16 or n == (3 * N) / 16 or n == N / 4 or n == N / 2 or n == (3 * N) / 4 or n == N / 32 or n == (2 * N) / 32 or n == (3 * N) / N:
                 # draw graphs
                 self.__update_pandas_data()
-                self.draw_graph(f"graph_at_{n}_{N}", "graphs")
+                self.draw_graph(f"graph_at_{n}_{N}", "oop_graphs")
                 # print log
                 print(f"________n = {n}________")
                 print("Q_av: ", np.average(np.abs(flow_list)))

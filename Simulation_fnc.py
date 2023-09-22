@@ -2,14 +2,19 @@ import angiogenesis_fnc as an
 import time
 import numpy as np
 import cProfile as profile
+import sys
 
+# Logging
+stdoutOrigin=sys.stdout
+sys.stdout = open("fnc_log.txt", "w")
+print("Program run at:")
+print(time.ctime(), '\n')
 
-# In outer section of code
+# Profiling
 pr = profile.Profile()
 pr.enable()
-
-
 start_time = time.time()
+
 '----------------functional approach------------------------'
 start_time_func_ver = time.time()
 
@@ -44,8 +49,12 @@ an.run_simulation("f_version_graphs", **arguments, **parameters_set, is_scaled=T
 #print(edges_data)
 #print(nodes_data)
 
-print(f"time elapsed for function version: {(time.time() - start_time_func_ver):.4f}s")
+print(f"\ntime elapsed for function version: {(time.time() - start_time_func_ver):.4f}s")
 
-
+# Profiling end
 pr.disable()
 pr.dump_stats('profile3.pstat')
+
+# Logging end
+sys.stdout.close()
+sys.stdout=stdoutOrigin
