@@ -24,7 +24,8 @@ number_of_rowscols = 23
 number_of_nodes = number_of_rowscols*number_of_rowscols
 incidence_matrix, graph, nodes_data, edges_data = an.generate_grid_graph(number_of_rowscols, number_of_rowscols, hexagonal=hexagonal, triangular=triangular)
 
-source_value = number_of_rowscols - 1
+source_value = (number_of_rowscols/2)**2
+print(source_value)
 source_list = an.localise_source(graph, source_value, corridor_model=0, two_capacitor_plates_model=0,
                                 square_concentric_model=1, veins_square_concentric_model=0, triangular=0)
 
@@ -43,7 +44,7 @@ an.update_df(source_list, pressure_list, conductivity_list, flow_list, pressure_
 #print(nodes_data)
 
 # dK/dt = a*(Q/Q_hat)^(2*gamma) - b*K + c
-parameters_set = {'a': 3.1, 'b': 4.5, 'gamma': 2/3, 'delta': 2.01, 'nu': 1.1, 'flow_hat': np.average(np.abs(flow_list)), 'c': 0.001, 'r': 2.2, 'dt': 0.01, 'N': 64}
+parameters_set = {'a': 3.1, 'b': 4.5, 'gamma': 2/3, 'delta': 2.01, 'nu': 1.1, 'flow_hat': np.average(np.abs(flow_list)), 'c': 0.001, 'r': 2.2, 'dt': 0.01, 'N': 4}
 an.run_simulation("f_version_graphs", **arguments, **parameters_set, is_scaled=True)
 
 #print(edges_data)

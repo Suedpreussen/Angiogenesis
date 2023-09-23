@@ -81,7 +81,15 @@ class Model:
         # source in the center of the square lattice -- eye retina model
         # works only for odd number of rows/columns -- only then a central node exists
         nodes_dim = graph.number_of_nodes()
-        source_value = (number_of_rows_or_columns-1)**2/ 2
+
+        # Quote from Katifori:
+            # The components of the source vector are
+            # Si = −δ_0i + 1/(N-1)*(1-δ_0i)*a_j/sum(a_j),j=/=0
+        # so not only the center has some background source
+
+        # but yeah, I think source values should be dependent on the area of the graph, not side length
+        source_value = (number_of_rows_or_columns/2)**2
+        print(source_value)
         self.source_value = source_value
         if type_of_lattice == "square" and shape_of_boundaries == "square":
             source_list = np.zeros(nodes_dim)
@@ -187,7 +195,6 @@ class Model:
             edge_attrs[key] = vals
             iterator += 1
         nx.set_edge_attributes(self.graph, edge_attrs)
-        print("__update_networkx_data")
 
     def __check_kirchhoffs_and_murrays_law(self):
         index = 0
@@ -327,8 +334,6 @@ class Model:
         print("RHO: ", rho)
 
         source_hat = source_value
-        print("FLOW HAT   SOURCE HAT")
-        print(flow_hat, source_hat)
         kappa = (c / a) * np.float_power((flow_hat / source_hat), 2 * gamma)  # a/c is the ratio between background growth rate and adaptation strength and the hatted quantities are typical scales for flow and source strength.
         print("KAPPA: ", kappa)
 

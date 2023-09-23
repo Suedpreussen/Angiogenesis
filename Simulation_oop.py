@@ -32,7 +32,7 @@ parameters_set = {
     , 'c': 0.001
     , 'r': 2.2
     , 'dt': 0.01
-    , 'N': 64}
+    , 'N': 4}
 square_model.run_simulation(
     "oop_graphs"
     , **parameters_set
