@@ -196,7 +196,10 @@ def set_graph_attributes(graph, pressure_list, conductivity_list, flow_list, pre
         vals = {"pressure": pressure_list[iterator]}
         node_attrs[key] = vals
         iterator += 1
+    #print("GRAPH NODES before\n", dict(graph.nodes))
     nx.set_node_attributes(graph, node_attrs)
+    #print("GRAPH NODES after\n", dict(graph.nodes))
+
     # now for edges
     edge_attrs = dict(graph.edges)
     iterator = 0

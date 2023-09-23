@@ -43,7 +43,7 @@ an.update_df(source_list, pressure_list, conductivity_list, flow_list, pressure_
 #print(nodes_data)
 
 # dK/dt = a*(Q/Q_hat)^(2*gamma) - b*K + c
-parameters_set = {'a': 3.1, 'b': 4.5, 'gamma': 2/3, 'delta': 2.01, 'nu': 1.1, 'flow_hat': np.average(np.abs(flow_list)), 'c': 0.001, 'r': 2.2, 'dt': 0.01, 'N': 4}
+parameters_set = {'a': 3.1, 'b': 4.5, 'gamma': 2/3, 'delta': 2.01, 'nu': 1.1, 'flow_hat': np.average(np.abs(flow_list)), 'c': 0.001, 'r': 2.2, 'dt': 0.01, 'N': 64}
 an.run_simulation("f_version_graphs", **arguments, **parameters_set, is_scaled=True)
 
 #print(edges_data)

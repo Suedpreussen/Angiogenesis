@@ -174,7 +174,10 @@ class Model:
             vals = {"pressure": self.pressure_list[iterator]}
             node_attrs[key] = vals
             iterator += 1
+        #print("GRAPH NODES before\n", dict(self.graph.nodes))
         nx.set_node_attributes(self.graph, node_attrs)
+        #print("GRAPH NODES after\n", dict(self.graph.nodes))
+
         # now for edges
         edge_attrs = dict(self.graph.edges)
         iterator = 0
@@ -184,6 +187,7 @@ class Model:
             edge_attrs[key] = vals
             iterator += 1
         nx.set_edge_attributes(self.graph, edge_attrs)
+        print("__update_networkx_data")
 
     def __check_kirchhoffs_and_murrays_law(self):
         index = 0
@@ -303,6 +307,13 @@ class Model:
         incidence_matrix = self.incidence_matrix
         incidence_T = self.incidence_T
         incidence_inv = self.incidence_inv
+        # okay, so this won't work because __update_networkx_data acts upon self.* fields
+        # and here I create new variables that I put in the main loop, there they get changed
+        # and then I want to update networkx data, but this method works on self.* fields and not these new
+        # variables created in the scope of run_simulation method
+        # So I have to write 'self.' everywhere and see if it works
+        # or just copy all of the above into the body of loop
+        # it works but is it optimal?
 
         flow_hat = np.average(np.abs(flow_list))
         t = 0
@@ -316,6 +327,8 @@ class Model:
         print("RHO: ", rho)
 
         source_hat = source_value
+        print("FLOW HAT   SOURCE HAT")
+        print(flow_hat, source_hat)
         kappa = (c / a) * np.float_power((flow_hat / source_hat), 2 * gamma)  # a/c is the ratio between background growth rate and adaptation strength and the hatted quantities are typical scales for flow and source strength.
         print("KAPPA: ", kappa)
 
@@ -350,21 +363,35 @@ class Model:
 
         # MAIN LOOP
         for n in range(1, N + 1):
-            t += dt
+            graph = self.graph
+            source_list = self.source_list
+            source_value = self.source_value
+            pressure_list = self.pressure_list
+            length_list = self.length_list
+            conductivity_list = self.conductivity_list
+            flow_list = self.flow_list
+            pressure_diff_list = self.pressure_diff_list
+            nodes_data = self.nodes_data
+            edges_data = self.edges_data
+            number_of_rowscols = self.__number_of_rows_or_columns
+            incidence_matrix = self.incidence_matrix
+            incidence_T = self.incidence_T
+            incidence_inv = self.incidence_inv
 
+            t += dt
             # dK/dt = a*(q / q_hat)^(2*gamma) - b * K + c
-            dK = dt * (np.float_power(a * (np.abs(flow_list) / flow_hat),
-                                      (2 * gamma)) - b * conductivity_list + c * np.ones(len(flow_list)))
+            dK = dt * (np.float_power(a * (np.abs(self.flow_list) / flow_hat),
+                                      (2 * gamma)) - b * conductivity_list + c * np.ones(len(self.flow_list)))
             # dK = dt * (np.float_power(a * (np.abs(flow_from_lagrange_optimisation) / flow_hat), (2 * gamma)) - b * conductivity_list + c * np.ones(len(flow_list)))
-            conductivity_list += dK
+            self.conductivity_list += dK
 
             x = incidence_matrix @ np.diag(1 / length_list) @ np.diag(conductivity_list) @ incidence_T
             x_dagger = np.linalg.pinv(incidence_matrix @ np.diag(1 / length_list) @ np.diag(conductivity_list) @ incidence_T)
 
             # q = K/L * delta * (delta^T * K/L * delta)^dagger * S
-            flow_list = source_list @ x_dagger @ incidence_matrix @ np.diag(conductivity_list) @ np.diag(1 / length_list)
-            pressure_diff_list = length_list * (1 / conductivity_list) * flow_list
-            pressure_list = np.dot(pressure_diff_list, incidence_inv)
+            self.flow_list = source_list @ x_dagger @ incidence_matrix @ np.diag(conductivity_list) @ np.diag(1 / length_list)
+            pressure_diff_list = length_list * (1 / conductivity_list) * self.flow_list
+            self.pressure_list = np.dot(pressure_diff_list, incidence_inv)
             self.__compute_energy_dissipation(gamma)
 
             # updating data in graph dicts
@@ -387,3 +414,4 @@ class Model:
         print('simulation time: ', round(t * b, 3), "1/(b')  =  ", round(t, 3), "seconds")
         self.__update_pandas_data()
         self.__check_kirchhoffs_and_murrays_law()
+
